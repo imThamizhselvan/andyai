@@ -1,6 +1,7 @@
 import { Router } from 'express'
 import prisma from '../lib/prisma.js'
 import { requireAuth } from '../middleware/auth.js'
+import { createAgent, updateAgent } from '../lib/elevenlabs.js'
 
 const router = Router()
 
@@ -45,7 +46,7 @@ router.put('/', requireAuth, async (req, res) => {
 
     // Update voice agent if greeting or businessInfo provided
     if (greeting !== undefined || businessInfo !== undefined) {
-      await prisma.voiceAgent.upsert({
+      const voiceAgent = await prisma.voiceAgent.upsert({
         where: { userId: req.user.id },
         update: {
           ...(greeting !== undefined && { greeting }),
@@ -57,6 +58,20 @@ router.put('/', requireAuth, async (req, res) => {
           businessInfo: businessInfo || '',
         },
       })
+
+      // Sync with ElevenLabs if agent exists
+      if (voiceAgent.elevenLabsAgentId) {
+        try {
+          await updateAgent(voiceAgent.elevenLabsAgentId, {
+            name: user.businessName || 'My Business',
+            greeting: voiceAgent.greeting,
+            businessInfo: voiceAgent.businessInfo,
+            voiceId: voiceAgent.voiceId,
+          })
+        } catch (err) {
+          console.error('ElevenLabs agent update failed:', err.message)
+        }
+      }
     }
 
     res.json(user)
@@ -69,7 +84,10 @@ router.put('/', requireAuth, async (req, res) => {
 // Complete onboarding
 router.post('/onboard', requireAuth, async (req, res) => {
   try {
-    const { businessName, industry, greeting } = req.body
+    const { businessName, industry, greeting, businessInfo } = req.body
+
+    const agentGreeting = greeting || `Hi, thanks for calling ${businessName}! How can I help you today?`
+    const agentBusinessInfo = businessInfo || `${businessName} - ${industry}`
 
     // Update user
     const user = await prisma.user.update({
@@ -81,17 +99,33 @@ router.post('/onboard', requireAuth, async (req, res) => {
       },
     })
 
+    // Create ElevenLabs voice agent
+    let elevenLabsAgentId = null
+    try {
+      const agent = await createAgent({
+        name: businessName,
+        greeting: agentGreeting,
+        businessInfo: agentBusinessInfo,
+        voiceId: '21m00Tcm4TlvDq8ikWAM',
+      })
+      elevenLabsAgentId = agent.agent_id
+    } catch (err) {
+      console.error('ElevenLabs agent creation failed (continuing onboarding):', err.message)
+    }
+
     // Create voice agent config
     await prisma.voiceAgent.upsert({
       where: { userId: req.user.id },
       update: {
-        greeting: greeting || undefined,
-        businessInfo: `${businessName} - ${industry}`,
+        greeting: agentGreeting,
+        businessInfo: agentBusinessInfo,
+        ...(elevenLabsAgentId && { elevenLabsAgentId }),
       },
       create: {
         userId: req.user.id,
-        greeting: greeting || `Hi, thanks for calling ${businessName}! How can I help you today?`,
-        businessInfo: `${businessName} - ${industry}`,
+        greeting: agentGreeting,
+        businessInfo: agentBusinessInfo,
+        ...(elevenLabsAgentId && { elevenLabsAgentId }),
       },
     })
 

@@ -6,6 +6,8 @@ export default function Settings() {
   const [loading, setLoading] = useState(true)
   const [saving, setSaving] = useState(false)
   const [saved, setSaved] = useState(false)
+  const [activating, setActivating] = useState(false)
+  const [activateError, setActivateError] = useState(null)
 
   const [form, setForm] = useState({
     businessName: '',
@@ -53,6 +55,26 @@ export default function Settings() {
 
   const updateField = (field, value) => {
     setForm((prev) => ({ ...prev, [field]: value }))
+  }
+
+  const handleActivateAgent = async () => {
+    setActivating(true)
+    setActivateError(null)
+    try {
+      const result = await api.setupVoiceAgent({
+        greeting: form.greeting,
+        businessInfo: form.businessInfo,
+      })
+      setSettings((prev) => ({
+        ...prev,
+        voiceAgent: result,
+      }))
+    } catch (err) {
+      console.error('Failed to activate voice agent:', err)
+      setActivateError(err.message || 'Failed to activate voice agent')
+    } finally {
+      setActivating(false)
+    }
   }
 
   if (loading) {
@@ -167,18 +189,63 @@ export default function Settings() {
           </div>
         </div>
 
-        {/* Phone Number */}
-        {settings?.voiceAgent?.phoneNumber && (
-          <div className="bg-white rounded-xl border border-gray-200 p-6">
-            <h3 className="font-semibold text-gray-900 mb-2">Your Andy Phone Number</h3>
-            <p className="text-2xl font-mono font-bold text-primary">
-              {settings.voiceAgent.phoneNumber}
-            </p>
-            <p className="text-xs text-gray-400 mt-2">
-              Forward your business calls to this number so Andy can answer them.
-            </p>
-          </div>
-        )}
+        {/* Voice Agent Status */}
+        <div className="bg-white rounded-xl border border-gray-200 p-6">
+          <h3 className="font-semibold text-gray-900 mb-4">Voice Agent Status</h3>
+          {settings?.voiceAgent?.elevenLabsAgentId ? (
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-2.5 h-2.5 rounded-full bg-green-500 animate-pulse" />
+                <span className="text-sm font-medium text-green-700">Agent Active</span>
+              </div>
+              <p className="text-sm text-gray-500">
+                Your AI receptionist is set up and ready to handle calls.
+              </p>
+              {settings.voiceAgent.phoneNumber && (
+                <div className="mt-4 p-4 bg-primary/5 border border-primary/20 rounded-lg">
+                  <p className="text-xs font-medium text-gray-500 uppercase mb-1">Your Andy Phone Number</p>
+                  <p className="text-xl font-mono font-bold text-primary">
+                    {settings.voiceAgent.phoneNumber}
+                  </p>
+                  <p className="text-xs text-gray-400 mt-1">
+                    Forward your business calls to this number so Andy can answer them.
+                  </p>
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={handleActivateAgent}
+                disabled={activating}
+                className="mt-4 px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+              >
+                {activating ? 'Updating...' : 'Re-sync Agent with ElevenLabs'}
+              </button>
+            </div>
+          ) : (
+            <div>
+              <div className="flex items-center gap-2 mb-3">
+                <div className="w-2.5 h-2.5 rounded-full bg-gray-300" />
+                <span className="text-sm font-medium text-gray-500">Agent Not Activated</span>
+              </div>
+              <p className="text-sm text-gray-500 mb-4">
+                Activate your AI receptionist to start handling calls. Make sure you've configured your greeting and business context above first.
+              </p>
+              {activateError && (
+                <div className="bg-red-50 border border-red-200 rounded-lg p-3 mb-4">
+                  <p className="text-sm text-red-700">{activateError}</p>
+                </div>
+              )}
+              <button
+                type="button"
+                onClick={handleActivateAgent}
+                disabled={activating}
+                className="px-6 py-2.5 rounded-lg bg-primary text-white font-medium text-sm hover:bg-primary/90 transition-colors disabled:opacity-50"
+              >
+                {activating ? 'Activating...' : 'Activate Voice Agent'}
+              </button>
+            </div>
+          )}
+        </div>
 
         {/* Save Button */}
         <div className="flex items-center gap-3">

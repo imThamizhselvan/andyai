@@ -22,7 +22,8 @@ router.post('/checkout', requireAuth, async (req, res) => {
 
     let customerId = subscription?.stripeCustomerId
 
-    if (!customerId) {
+    // Create a real Stripe customer if none exists or if it's a placeholder
+    if (!customerId || customerId.startsWith('pending_')) {
       const customer = await stripe.customers.create({
         email: req.user.email,
         name: req.user.name || undefined,
@@ -30,7 +31,7 @@ router.post('/checkout', requireAuth, async (req, res) => {
       })
       customerId = customer.id
 
-      // Create subscription record
+      // Create or update subscription record with real Stripe customer ID
       await prisma.subscription.upsert({
         where: { userId: req.user.id },
         update: { stripeCustomerId: customerId },

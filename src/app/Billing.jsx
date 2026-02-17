@@ -46,6 +46,7 @@ export default function Billing() {
   const [subscription, setSubscription] = useState(null)
   const [loading, setLoading] = useState(true)
   const [actionLoading, setActionLoading] = useState(false)
+  const [error, setError] = useState(null)
 
   useEffect(() => {
     async function fetchSubscription() {
@@ -63,11 +64,13 @@ export default function Billing() {
 
   const handleSelectPlan = async (planKey) => {
     setActionLoading(true)
+    setError(null)
     try {
       const { url } = await api.createCheckout(planKey)
       window.location.href = url
     } catch (err) {
       console.error('Failed to create checkout:', err)
+      setError(err.message || 'Failed to create checkout session. Please try again.')
     } finally {
       setActionLoading(false)
     }
@@ -167,6 +170,13 @@ export default function Billing() {
           </div>
         </div>
       </div>
+
+      {/* Error */}
+      {error && (
+        <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
+          <p className="text-sm text-red-700">{error}</p>
+        </div>
+      )}
 
       {/* Plans */}
       <h3 className="font-semibold text-gray-900 mb-4">Available Plans</h3>
