@@ -30,7 +30,7 @@ router.get('/', requireAuth, async (req, res) => {
 // Update user settings
 router.put('/', requireAuth, async (req, res) => {
   try {
-    const { name, businessName, industry, phone } = req.body
+    const { name, businessName, industry, phone, greeting, businessInfo } = req.body
 
     const user = await prisma.user.update({
       where: { id: req.user.id },
@@ -40,7 +40,24 @@ router.put('/', requireAuth, async (req, res) => {
         ...(industry !== undefined && { industry }),
         ...(phone !== undefined && { phone }),
       },
+      include: { voiceAgent: true },
     })
+
+    // Update voice agent if greeting or businessInfo provided
+    if (greeting !== undefined || businessInfo !== undefined) {
+      await prisma.voiceAgent.upsert({
+        where: { userId: req.user.id },
+        update: {
+          ...(greeting !== undefined && { greeting }),
+          ...(businessInfo !== undefined && { businessInfo }),
+        },
+        create: {
+          userId: req.user.id,
+          greeting: greeting || 'Hi, thanks for calling! How can I help you today?',
+          businessInfo: businessInfo || '',
+        },
+      })
+    }
 
     res.json(user)
   } catch (error) {
