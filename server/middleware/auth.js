@@ -55,6 +55,7 @@ export async function requireAuth(req, res, next) {
       jwt.verify(token, getKey(issuer), {
         algorithms: ['RS256'],
         issuer,
+        clockTolerance: 30,
       }, (err, decoded) => {
         if (err) reject(err)
         else resolve(decoded)
