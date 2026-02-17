@@ -6,6 +6,7 @@ import callRoutes from './routes/calls.js'
 import billingRoutes from './routes/billing.js'
 import settingsRoutes from './routes/settings.js'
 import voiceRoutes from './routes/voice.js'
+import demoRoutes from './routes/demo.js'
 
 const app = express()
 const PORT = process.env.PORT || 3001
@@ -37,6 +38,7 @@ app.get('/api/health', (req, res) => {
 })
 
 // Routes
+app.use('/api/demo', demoRoutes)
 app.use('/api/webhooks', webhookRoutes)
 app.use('/api/calls', callRoutes)
 app.use('/api/billing', billingRoutes)

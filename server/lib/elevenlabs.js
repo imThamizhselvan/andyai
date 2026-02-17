@@ -71,4 +71,15 @@ export async function getAgent(agentId) {
   return response.data
 }
 
+export async function initiateOutboundCall({ agentId, toNumber }) {
+  const response = await elevenlabs.post('/convai/twilio/outbound-call', {
+    agent_id: agentId,
+    to_number: toNumber,
+    from_number: process.env.TWILIO_PHONE_NUMBER,
+    twilio_account_sid: process.env.TWILIO_ACCOUNT_SID,
+    twilio_auth_token: process.env.TWILIO_AUTH_TOKEN,
+  })
+  return response.data
+}
+
 export default elevenlabs

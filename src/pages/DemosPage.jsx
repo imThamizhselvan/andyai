@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import { Link } from 'react-router-dom'
 import AnimatedSection from '../components/AnimatedSection'
+import { api } from '../lib/api'
 
 const demos = [
   {
@@ -75,6 +76,22 @@ const demos = [
 
 export default function DemosPage() {
   const [activeDemo, setActiveDemo] = useState(0)
+  const [phone, setPhone] = useState('')
+  const [callStatus, setCallStatus] = useState('idle') // idle | loading | success | error
+  const [callError, setCallError] = useState('')
+
+  async function handleDemoCall(e) {
+    e.preventDefault()
+    setCallStatus('loading')
+    setCallError('')
+    try {
+      await api.requestDemoCall(phone)
+      setCallStatus('success')
+    } catch (err) {
+      setCallError(err.message)
+      setCallStatus('error')
+    }
+  }
 
   return (
     <div>
@@ -222,6 +239,71 @@ export default function DemosPage() {
                 </div>
               </div>
             </div>
+          </AnimatedSection>
+        </div>
+      </section>
+
+      {/* Experience Andy Live */}
+      <section className="section-padding bg-gray-50">
+        <div className="max-w-2xl mx-auto text-center">
+          <AnimatedSection>
+            <span className="inline-block px-4 py-2 rounded-full bg-primary/10 text-primary text-sm font-semibold mb-4">
+              Try It Yourself
+            </span>
+            <h2 className="text-3xl sm:text-4xl font-black text-gray-900 mb-4">
+              Experience Andy <span className="gradient-text">Live</span>
+            </h2>
+            <p className="text-lg text-gray-600 mb-8">
+              Enter your phone number and Andy will call you right now as a sample plumbing receptionist. See the magic firsthand.
+            </p>
+
+            {callStatus === 'success' ? (
+              <div className="bg-emerald-50 border border-emerald-200 rounded-xl p-6">
+                <div className="w-12 h-12 rounded-full bg-emerald-100 flex items-center justify-center mx-auto mb-3">
+                  <svg className="w-6 h-6 text-emerald-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+                  </svg>
+                </div>
+                <p className="text-emerald-800 font-semibold text-lg">Andy is calling you now!</p>
+                <p className="text-emerald-600 text-sm mt-1">Pick up your phone to experience the demo.</p>
+              </div>
+            ) : (
+              <form onSubmit={handleDemoCall} className="flex flex-col sm:flex-row gap-3 max-w-md mx-auto">
+                <input
+                  type="tel"
+                  placeholder="+1 (555) 123-4567"
+                  value={phone}
+                  onChange={(e) => setPhone(e.target.value)}
+                  className="flex-1 px-4 py-3 rounded-xl border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none text-gray-900"
+                  required
+                />
+                <button
+                  type="submit"
+                  disabled={callStatus === 'loading'}
+                  className="btn-primary whitespace-nowrap disabled:opacity-60"
+                >
+                  {callStatus === 'loading' ? (
+                    <span className="flex items-center gap-2">
+                      <svg className="w-4 h-4 animate-spin" fill="none" viewBox="0 0 24 24">
+                        <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
+                        <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z" />
+                      </svg>
+                      Calling...
+                    </span>
+                  ) : (
+                    'Call Me Now'
+                  )}
+                </button>
+              </form>
+            )}
+
+            {callStatus === 'error' && (
+              <p className="text-red-600 text-sm mt-3">{callError}</p>
+            )}
+
+            <p className="text-xs text-gray-400 mt-4">
+              We'll call you from our demo line. Standard carrier rates may apply.
+            </p>
           </AnimatedSection>
         </div>
       </section>

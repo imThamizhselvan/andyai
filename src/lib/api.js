@@ -70,4 +70,16 @@ export const api = {
       method: 'POST',
       body: JSON.stringify(data),
     }),
+
+  // Demo call (public — no auth needed)
+  requestDemoCall: async (phone) => {
+    const res = await fetch(`${API_URL}/api/demo/call`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone }),
+    })
+    const data = await res.json()
+    if (!res.ok) throw new Error(data.error || 'Failed to request demo call')
+    return data
+  },
 }

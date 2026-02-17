@@ -8,6 +8,22 @@ export default function Dashboard() {
   const [stats, setStats] = useState(null)
   const [recentCalls, setRecentCalls] = useState([])
   const [loading, setLoading] = useState(true)
+  const [testPhone, setTestPhone] = useState('')
+  const [testStatus, setTestStatus] = useState('idle')
+  const [testError, setTestError] = useState('')
+
+  async function handleTestCall(e) {
+    e.preventDefault()
+    setTestStatus('loading')
+    setTestError('')
+    try {
+      await api.requestDemoCall(testPhone)
+      setTestStatus('success')
+    } catch (err) {
+      setTestError(err.message)
+      setTestStatus('error')
+    }
+  }
 
   useEffect(() => {
     async function fetchData() {
@@ -145,6 +161,52 @@ export default function Dashboard() {
             style={{ width: `${usagePercent}%` }}
           />
         </div>
+      </div>
+
+      {/* Test a Call */}
+      <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
+        <div className="flex items-center gap-3 mb-4">
+          <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
+            </svg>
+          </div>
+          <div>
+            <h3 className="font-semibold text-gray-900">Test a Call</h3>
+            <p className="text-sm text-gray-500">Have Andy call your phone so you can hear it live.</p>
+          </div>
+        </div>
+
+        {testStatus === 'success' ? (
+          <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 rounded-lg px-4 py-3 text-sm">
+            <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            Andy is calling you now! Pick up your phone.
+          </div>
+        ) : (
+          <form onSubmit={handleTestCall} className="flex gap-3">
+            <input
+              type="tel"
+              placeholder="+1 (555) 123-4567"
+              value={testPhone}
+              onChange={(e) => setTestPhone(e.target.value)}
+              className="flex-1 px-4 py-2.5 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none text-sm"
+              required
+            />
+            <button
+              type="submit"
+              disabled={testStatus === 'loading'}
+              className="px-5 py-2.5 bg-primary text-white rounded-lg font-medium text-sm hover:bg-primary/90 transition-colors disabled:opacity-60 whitespace-nowrap"
+            >
+              {testStatus === 'loading' ? 'Calling...' : 'Call Me'}
+            </button>
+          </form>
+        )}
+
+        {testStatus === 'error' && (
+          <p className="text-red-600 text-sm mt-2">{testError}</p>
+        )}
       </div>
 
       {/* Recent Calls */}
