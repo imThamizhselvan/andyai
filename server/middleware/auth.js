@@ -2,29 +2,20 @@ import jwt from 'jsonwebtoken'
 import jwksClient from 'jwks-rsa'
 import prisma from '../lib/prisma.js'
 
-// Extract the Clerk frontend API from the publishable key
-// pk_test_xxx encodes the frontend API domain in base64
-function getClerkDomain() {
-  // Fallback: use CLERK_SECRET_KEY to derive the issuer isn't reliable,
-  // so we use the CLERK_ISSUER env or construct from the publishable key
-  if (process.env.CLERK_ISSUER) {
-    return process.env.CLERK_ISSUER
-  }
-  // Default Clerk issuer pattern
-  return null
-}
-
-let client = null
+const jwksClients = new Map()
 
 function getJwksClient(issuer) {
-  if (!client) {
-    client = jwksClient({
-      jwksUri: `${issuer}/.well-known/jwks.json`,
-      cache: true,
-      rateLimit: true,
-    })
+  if (!jwksClients.has(issuer)) {
+    jwksClients.set(
+      issuer,
+      jwksClient({
+        jwksUri: `${issuer}/.well-known/jwks.json`,
+        cache: true,
+        rateLimit: true,
+      })
+    )
   }
-  return client
+  return jwksClients.get(issuer)
 }
 
 function getKey(issuer) {
@@ -40,6 +31,7 @@ export async function requireAuth(req, res, next) {
   try {
     const authHeader = req.headers.authorization
     if (!authHeader || !authHeader.startsWith('Bearer ')) {
+      console.error('Auth: No bearer token in request')
       return res.status(401).json({ error: 'No token provided' })
     }
 
@@ -48,10 +40,15 @@ export async function requireAuth(req, res, next) {
     // Decode without verifying to get the issuer
     const decoded = jwt.decode(token, { complete: true })
     if (!decoded) {
+      console.error('Auth: Could not decode JWT')
       return res.status(401).json({ error: 'Invalid token' })
     }
 
     const issuer = decoded.payload.iss
+    if (!issuer) {
+      console.error('Auth: No issuer in token')
+      return res.status(401).json({ error: 'Invalid token - no issuer' })
+    }
 
     // Verify the JWT using Clerk's JWKS
     const payload = await new Promise((resolve, reject) => {
@@ -77,7 +74,6 @@ export async function requireAuth(req, res, next) {
 
     if (!user) {
       // Auto-create user from Clerk data
-      // Use Clerk Backend API to get user details
       const clerkRes = await fetch(`https://api.clerk.com/v1/users/${clerkId}`, {
         headers: { Authorization: `Bearer ${process.env.CLERK_SECRET_KEY}` },
       })
@@ -96,7 +92,7 @@ export async function requireAuth(req, res, next) {
     req.user = user
     next()
   } catch (error) {
-    console.error('Auth error:', error.message)
+    console.error('Auth error:', error.message, error.name)
     return res.status(401).json({ error: 'Unauthorized' })
   }
 }
