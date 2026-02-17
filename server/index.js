@@ -19,12 +19,14 @@ const allowedOrigins = [
   process.env.FRONTEND_URL,
 ].filter(Boolean)
 
-app.use(
-  cors({
-    origin: allowedOrigins,
-    credentials: true,
-  })
-)
+const corsOptions = {
+  origin: allowedOrigins,
+  credentials: true,
+}
+
+// Handle preflight OPTIONS requests explicitly
+app.options('*', cors(corsOptions))
+app.use(cors(corsOptions))
 
 // JSON parsing for everything else
 app.use(express.json())
