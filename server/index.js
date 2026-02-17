@@ -22,10 +22,10 @@ const allowedOrigins = [
 const corsOptions = {
   origin: allowedOrigins,
   credentials: true,
+  methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+  allowedHeaders: ['Content-Type', 'Authorization'],
 }
 
-// Handle preflight OPTIONS requests explicitly
-app.options('*', cors(corsOptions))
 app.use(cors(corsOptions))
 
 // JSON parsing for everything else
