@@ -14,9 +14,14 @@ const PORT = process.env.PORT || 3001
 app.use('/api/webhooks/stripe', express.raw({ type: 'application/json' }))
 
 // CORS
+const allowedOrigins = [
+  'http://localhost:5173',
+  process.env.FRONTEND_URL,
+].filter(Boolean)
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || 'http://localhost:5173',
+    origin: allowedOrigins,
     credentials: true,
   })
 )
