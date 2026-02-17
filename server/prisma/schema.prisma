@@ -1,0 +1,68 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id           String   @id @default(cuid())
+  clerkId      String   @unique
+  email        String   @unique
+  name         String?
+  businessName String?
+  industry     String?
+  phone        String?
+  onboarded    Boolean  @default(false)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  subscription Subscription?
+  calls        Call[]
+  voiceAgent   VoiceAgent?
+}
+
+model Subscription {
+  id               String    @id @default(cuid())
+  userId           String    @unique
+  user             User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  stripeCustomerId String    @unique
+  stripeSubId      String?   @unique
+  plan             String    @default("free")
+  status           String    @default("trialing")
+  callsUsed        Int       @default(0)
+  callsLimit       Int       @default(10)
+  currentPeriodEnd DateTime?
+  createdAt        DateTime  @default(now())
+  updatedAt        DateTime  @updatedAt
+}
+
+model Call {
+  id            String    @id @default(cuid())
+  userId        String
+  user          User      @relation(fields: [userId], references: [id], onDelete: Cascade)
+  callerName    String?
+  callerPhone   String?
+  duration      Int?
+  summary       String?
+  transcript    String?
+  status        String    @default("completed")
+  urgency       String?
+  appointmentAt DateTime?
+  createdAt     DateTime  @default(now())
+
+  @@index([userId, createdAt(sort: Desc)])
+}
+
+model VoiceAgent {
+  id                String  @id @default(cuid())
+  userId            String  @unique
+  user              User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+  elevenLabsAgentId String?
+  greeting          String  @default("Hi, thanks for calling! How can I help you today?")
+  businessInfo      String?
+  voiceId           String  @default("21m00Tcm4TlvDq8ikWAM")
+  phoneNumber       String?
+}
