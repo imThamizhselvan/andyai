@@ -65,6 +65,11 @@ export const api = {
 
   // Voice
   getVoiceSignedUrl: () => request('/api/voice/signed-url'),
+  requestTestCall: (phone) =>
+    request('/api/voice/test-call', {
+      method: 'POST',
+      body: JSON.stringify({ phone }),
+    }),
   getVoiceAgent: () => request('/api/voice'),
   setupVoiceAgent: (data) =>
     request('/api/voice/setup', {

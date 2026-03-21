@@ -18,7 +18,7 @@ export default function Dashboard() {
     setTestStatus('loading')
     setTestError('')
     try {
-      await api.requestDemoCall(testPhone)
+      await api.requestTestCall(testPhone)
       setTestStatus('success')
     } catch (err) {
       setTestError(err.message)
