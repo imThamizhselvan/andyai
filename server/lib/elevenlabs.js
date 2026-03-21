@@ -82,4 +82,11 @@ export async function initiateOutboundCall({ agentId, toNumber }) {
   return response.data
 }
 
+export async function getSignedUrl(agentId) {
+  const response = await elevenlabs.get('/convai/conversation/get_signed_url', {
+    params: { agent_id: agentId },
+  })
+  return response.data
+}
+
 export default elevenlabs

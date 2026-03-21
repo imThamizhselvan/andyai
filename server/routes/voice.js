@@ -1,6 +1,6 @@
 import { Router } from 'express'
 import prisma from '../lib/prisma.js'
-import { createAgent, updateAgent } from '../lib/elevenlabs.js'
+import { createAgent, updateAgent, getSignedUrl } from '../lib/elevenlabs.js'
 import { requireAuth } from '../middleware/auth.js'
 
 const router = Router()
@@ -60,6 +60,29 @@ router.post('/setup', requireAuth, async (req, res) => {
   } catch (error) {
     console.error('Voice setup error:', error)
     res.status(500).json({ error: 'Failed to set up voice agent' })
+  }
+})
+
+// Get signed URL for browser-based ConvAI session
+router.get('/signed-url', requireAuth, async (req, res) => {
+  try {
+    if (!process.env.ELEVENLABS_API_KEY) {
+      return res.status(503).json({ error: 'ElevenLabs is not configured' })
+    }
+
+    const voiceAgent = await prisma.voiceAgent.findUnique({
+      where: { userId: req.user.id },
+    })
+
+    if (!voiceAgent?.elevenLabsAgentId) {
+      return res.status(404).json({ error: 'Voice agent not set up yet. Please activate it in Settings.' })
+    }
+
+    const data = await getSignedUrl(voiceAgent.elevenLabsAgentId)
+    res.json({ signedUrl: data.signed_url })
+  } catch (error) {
+    console.error('Signed URL error:', error)
+    res.status(500).json({ error: 'Failed to get signed URL' })
   }
 })
 

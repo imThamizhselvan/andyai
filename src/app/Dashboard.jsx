@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { Link } from 'react-router-dom'
 import { useUser } from '@clerk/clerk-react'
 import { api } from '../lib/api'
+import VoiceWidget from '../components/VoiceWidget'
 
 export default function Dashboard() {
   const { user } = useUser()
@@ -162,6 +163,9 @@ export default function Dashboard() {
           />
         </div>
       </div>
+
+      {/* Browser Voice Conversation */}
+      <VoiceWidget />
 
       {/* Test a Call */}
       <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">

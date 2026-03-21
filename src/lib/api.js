@@ -64,6 +64,7 @@ export const api = {
     }),
 
   // Voice
+  getVoiceSignedUrl: () => request('/api/voice/signed-url'),
   getVoiceAgent: () => request('/api/voice'),
   setupVoiceAgent: (data) =>
     request('/api/voice/setup', {
