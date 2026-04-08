@@ -72,21 +72,19 @@ export async function getAgent(agentId) {
 }
 
 export async function initiateOutboundCall({ agentId, toNumber }) {
-  console.log('Outbound call config:', {
-    agent_id: agentId,
-    to_number: toNumber,
-    from_number: process.env.TWILIO_PHONE_NUMBER || 'MISSING',
-    twilio_account_sid: process.env.TWILIO_ACCOUNT_SID ? 'SET' : 'MISSING',
-    twilio_auth_token: process.env.TWILIO_AUTH_TOKEN ? 'SET' : 'MISSING',
-  })
-  const response = await elevenlabs.post('/convai/twilio/outbound-call', {
-    agent_id: agentId,
-    to_number: toNumber,
-    from_number: process.env.TWILIO_PHONE_NUMBER,
-    twilio_account_sid: process.env.TWILIO_ACCOUNT_SID,
-    twilio_auth_token: process.env.TWILIO_AUTH_TOKEN,
-  })
-  return response.data
+  try {
+    const response = await elevenlabs.post('/convai/twilio/outbound-call', {
+      agent_id: agentId,
+      to_number: toNumber,
+      from_number: process.env.TWILIO_PHONE_NUMBER,
+      twilio_account_sid: process.env.TWILIO_ACCOUNT_SID,
+      twilio_auth_token: process.env.TWILIO_AUTH_TOKEN,
+    })
+    return response.data
+  } catch (err) {
+    console.error('ElevenLabs outbound call full error:', JSON.stringify(err.response?.data, null, 2))
+    throw err
+  }
 }
 
 export async function getSignedUrl(agentId) {
