@@ -103,35 +103,35 @@ export default function Billing() {
   return (
     <div>
       <div className="mb-6">
-        <h1 className="text-2xl font-bold text-gray-900">Billing</h1>
-        <p className="text-gray-500 mt-1">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">Billing</h1>
+        <p className="text-gray-500 dark:text-gray-400 mt-1">
           Manage your subscription and view usage.
         </p>
       </div>
 
       {/* Current Plan */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6 mb-6">
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6 mb-6">
         <div className="flex items-start justify-between">
           <div>
-            <h3 className="font-semibold text-gray-900">Current Plan</h3>
+            <h3 className="font-semibold text-gray-900 dark:text-white">Current Plan</h3>
             <div className="flex items-center gap-3 mt-2">
-              <span className="text-2xl font-bold text-gray-900 capitalize">
+              <span className="text-2xl font-bold text-gray-900 dark:text-white capitalize">
                 {subscription?.plan || 'Free'}
               </span>
               <span
                 className={`px-2.5 py-0.5 rounded-full text-xs font-medium ${
                   subscription?.status === 'active'
-                    ? 'bg-green-100 text-green-700'
+                    ? 'bg-green-100 dark:bg-green-950/50 text-green-700 dark:text-green-400'
                     : subscription?.status === 'trialing'
-                    ? 'bg-blue-100 text-blue-700'
-                    : 'bg-gray-100 text-gray-600'
+                    ? 'bg-blue-100 dark:bg-blue-950/50 text-blue-700 dark:text-blue-400'
+                    : 'bg-gray-100 dark:bg-gray-800 text-gray-600 dark:text-gray-400'
                 }`}
               >
                 {subscription?.status || 'inactive'}
               </span>
             </div>
             {subscription?.currentPeriodEnd && (
-              <p className="text-sm text-gray-500 mt-1">
+              <p className="text-sm text-gray-500 dark:text-gray-400 mt-1">
                 {subscription.status === 'trialing' ? 'Trial ends' : 'Renews'}{' '}
                 {new Date(subscription.currentPeriodEnd).toLocaleDateString()}
               </p>
@@ -141,7 +141,7 @@ export default function Billing() {
             <button
               onClick={handleManageBilling}
               disabled={actionLoading}
-              className="px-4 py-2 rounded-lg border border-gray-200 text-sm font-medium text-gray-700 hover:bg-gray-50 transition-colors disabled:opacity-50"
+              className="px-4 py-2 rounded-lg border border-gray-200 dark:border-gray-700 text-sm font-medium text-gray-700 dark:text-gray-300 hover:bg-gray-50 dark:hover:bg-gray-800 transition-colors disabled:opacity-50"
             >
               Manage Billing
             </button>
@@ -151,12 +151,12 @@ export default function Billing() {
         {/* Usage */}
         <div className="mt-6">
           <div className="flex items-center justify-between mb-2">
-            <span className="text-sm text-gray-500">
+            <span className="text-sm text-gray-500 dark:text-gray-400">
               {subscription?.callsUsed || 0} of {subscription?.callsLimit || 10} calls used
             </span>
-            <span className="text-sm font-medium text-gray-700">{usagePercent}%</span>
+            <span className="text-sm font-medium text-gray-700 dark:text-gray-300">{usagePercent}%</span>
           </div>
-          <div className="w-full bg-gray-100 rounded-full h-2.5">
+          <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-2.5">
             <div
               className={`h-2.5 rounded-full transition-all duration-500 ${
                 usagePercent > 80
@@ -173,25 +173,25 @@ export default function Billing() {
 
       {/* Error */}
       {error && (
-        <div className="bg-red-50 border border-red-200 rounded-xl p-4 mb-6">
-          <p className="text-sm text-red-700">{error}</p>
+        <div className="bg-red-50 dark:bg-red-950/50 border border-red-200 dark:border-red-800 rounded-xl p-4 mb-6">
+          <p className="text-sm text-red-700 dark:text-red-400">{error}</p>
         </div>
       )}
 
       {/* Plans */}
-      <h3 className="font-semibold text-gray-900 mb-4">Available Plans</h3>
+      <h3 className="font-semibold text-gray-900 dark:text-white mb-4">Available Plans</h3>
       <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
         {plans.map((plan) => {
           const isCurrent = subscription?.plan === plan.key
           return (
             <div
               key={plan.key}
-              className={`bg-white rounded-xl border-2 p-6 relative ${
+              className={`bg-white dark:bg-gray-900 rounded-xl border-2 p-6 relative ${
                 plan.popular
                   ? 'border-primary'
                   : isCurrent
-                  ? 'border-gray-300'
-                  : 'border-gray-200'
+                  ? 'border-gray-300 dark:border-gray-600'
+                  : 'border-gray-200 dark:border-gray-800'
               }`}
             >
               {plan.popular && (
@@ -199,14 +199,14 @@ export default function Billing() {
                   Most Popular
                 </span>
               )}
-              <h4 className="font-semibold text-gray-900">{plan.name}</h4>
+              <h4 className="font-semibold text-gray-900 dark:text-white">{plan.name}</h4>
               <div className="mt-2 mb-4">
-                <span className="text-3xl font-bold text-gray-900">{plan.price}</span>
-                <span className="text-sm text-gray-500">{plan.period}</span>
+                <span className="text-3xl font-bold text-gray-900 dark:text-white">{plan.price}</span>
+                <span className="text-sm text-gray-500 dark:text-gray-400">{plan.period}</span>
               </div>
               <ul className="space-y-2 mb-6">
                 {plan.features.map((feature) => (
-                  <li key={feature} className="flex items-start gap-2 text-sm text-gray-600">
+                  <li key={feature} className="flex items-start gap-2 text-sm text-gray-600 dark:text-gray-400">
                     <svg className="w-4 h-4 text-primary mt-0.5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
@@ -217,7 +217,7 @@ export default function Billing() {
               {isCurrent ? (
                 <button
                   disabled
-                  className="w-full py-2.5 rounded-lg text-sm font-medium bg-gray-100 text-gray-500 cursor-not-allowed"
+                  className="w-full py-2.5 rounded-lg text-sm font-medium bg-gray-100 dark:bg-gray-800 text-gray-500 dark:text-gray-500 cursor-not-allowed"
                 >
                   Current Plan
                 </button>
@@ -230,7 +230,7 @@ export default function Billing() {
                   className={`w-full py-2.5 rounded-lg text-sm font-medium transition-colors disabled:opacity-50 ${
                     plan.popular
                       ? 'bg-primary text-white hover:bg-primary/90'
-                      : 'bg-gray-900 text-white hover:bg-gray-800'
+                      : 'bg-gray-900 dark:bg-gray-700 text-white hover:bg-gray-800 dark:hover:bg-gray-600'
                   }`}
                 >
                   {subscription?.plan === 'free' ? 'Start Plan' : 'Switch Plan'}
