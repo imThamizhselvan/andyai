@@ -20,6 +20,7 @@ export default function Dashboard() {
     try {
       await api.requestTestCall(testPhone)
       setTestStatus('success')
+      setTimeout(() => setTestStatus('idle'), 5000)
     } catch (err) {
       setTestError(err.message)
       setTestStatus('error')
@@ -61,7 +62,7 @@ export default function Dashboard() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
         </svg>
       ),
-      color: 'text-blue-600 bg-blue-50',
+      color: 'text-blue-600 bg-blue-50 dark:text-blue-400 dark:bg-blue-950/50',
     },
     {
       label: 'This Month',
@@ -81,7 +82,7 @@ export default function Dashboard() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       ),
-      color: 'text-emerald-600 bg-emerald-50',
+      color: 'text-emerald-600 bg-emerald-50 dark:text-emerald-400 dark:bg-emerald-950/50',
     },
     {
       label: 'Avg Duration',
@@ -91,7 +92,7 @@ export default function Dashboard() {
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       ),
-      color: 'text-purple-600 bg-purple-50',
+      color: 'text-purple-600 bg-purple-50 dark:text-purple-400 dark:bg-purple-950/50',
     },
   ]
 
@@ -103,10 +104,10 @@ export default function Dashboard() {
     <div>
       {/* Header */}
       <div className="mb-8">
-        <h1 className="text-2xl font-bold text-gray-900">
+        <h1 className="text-2xl font-bold text-gray-900 dark:text-white">
           Welcome back{user?.firstName ? `, ${user.firstName}` : ''}
         </h1>
-        <p className="text-gray-500 mt-1">
+        <p className="text-gray-500 dark:text-gray-400 mt-1">
           Here's what's happening with your calls.
         </p>
       </div>
@@ -116,27 +117,27 @@ export default function Dashboard() {
         {statCards.map((card) => (
           <div
             key={card.label}
-            className="bg-white rounded-xl border border-gray-200 p-5"
+            className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-5"
           >
             <div className="flex items-center justify-between mb-3">
-              <span className="text-sm font-medium text-gray-500">
+              <span className="text-sm font-medium text-gray-500 dark:text-gray-400">
                 {card.label}
               </span>
               <div className={`w-10 h-10 rounded-lg flex items-center justify-center ${card.color}`}>
                 {card.icon}
               </div>
             </div>
-            <p className="text-2xl font-bold text-gray-900">{card.value}</p>
+            <p className="text-2xl font-bold text-gray-900 dark:text-white">{card.value}</p>
           </div>
         ))}
       </div>
 
       {/* Usage Bar */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6 mb-8">
         <div className="flex items-center justify-between mb-3">
           <div>
-            <h3 className="font-semibold text-gray-900">Plan Usage</h3>
-            <p className="text-sm text-gray-500">
+            <h3 className="font-semibold text-gray-900 dark:text-white">Plan Usage</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">
               {stats?.callsUsed || 0} of {stats?.callsLimit || 10} calls used
               <span className="ml-2 px-2 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
                 {stats?.plan || 'Free'} Plan
@@ -150,7 +151,7 @@ export default function Dashboard() {
             Upgrade
           </Link>
         </div>
-        <div className="w-full bg-gray-100 rounded-full h-3">
+        <div className="w-full bg-gray-100 dark:bg-gray-800 rounded-full h-3">
           <div
             className={`h-3 rounded-full transition-all duration-500 ${
               usagePercent > 80
@@ -168,7 +169,7 @@ export default function Dashboard() {
       <VoiceWidget />
 
       {/* Test a Call */}
-      <div className="bg-white rounded-xl border border-gray-200 p-6 mb-8">
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800 p-6 mb-8">
         <div className="flex items-center gap-3 mb-4">
           <div className="w-10 h-10 rounded-lg bg-primary/10 flex items-center justify-center text-primary">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -176,13 +177,13 @@ export default function Dashboard() {
             </svg>
           </div>
           <div>
-            <h3 className="font-semibold text-gray-900">Test a Call</h3>
-            <p className="text-sm text-gray-500">Have Andy call your phone so you can hear it live.</p>
+            <h3 className="font-semibold text-gray-900 dark:text-white">Test a Call</h3>
+            <p className="text-sm text-gray-500 dark:text-gray-400">Have Andy call your phone so you can hear it live.</p>
           </div>
         </div>
 
         {testStatus === 'success' ? (
-          <div className="flex items-center gap-2 text-emerald-600 bg-emerald-50 rounded-lg px-4 py-3 text-sm">
+          <div className="flex items-center gap-2 text-emerald-600 dark:text-emerald-400 bg-emerald-50 dark:bg-emerald-950/50 rounded-lg px-4 py-3 text-sm">
             <svg className="w-5 h-5 flex-shrink-0" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
@@ -195,7 +196,7 @@ export default function Dashboard() {
               placeholder="+1 (555) 123-4567"
               value={testPhone}
               onChange={(e) => setTestPhone(e.target.value)}
-              className="flex-1 px-4 py-2.5 rounded-lg border border-gray-300 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none text-sm"
+              className="flex-1 px-4 py-2.5 rounded-lg border border-gray-300 dark:border-gray-700 dark:bg-gray-800 dark:text-white dark:placeholder-gray-500 focus:border-primary focus:ring-2 focus:ring-primary/20 outline-none text-sm"
               required
             />
             <button
@@ -209,14 +210,14 @@ export default function Dashboard() {
         )}
 
         {testStatus === 'error' && (
-          <p className="text-red-600 text-sm mt-2">{testError}</p>
+          <p className="text-red-600 dark:text-red-400 text-sm mt-2">{testError}</p>
         )}
       </div>
 
       {/* Recent Calls */}
-      <div className="bg-white rounded-xl border border-gray-200">
-        <div className="px-6 py-4 border-b border-gray-100 flex items-center justify-between">
-          <h3 className="font-semibold text-gray-900">Recent Calls</h3>
+      <div className="bg-white dark:bg-gray-900 rounded-xl border border-gray-200 dark:border-gray-800">
+        <div className="px-6 py-4 border-b border-gray-100 dark:border-gray-800 flex items-center justify-between">
+          <h3 className="font-semibold text-gray-900 dark:text-white">Recent Calls</h3>
           <Link
             to="/app/calls"
             className="text-sm font-medium text-primary hover:underline"
@@ -227,26 +228,26 @@ export default function Dashboard() {
 
         {recentCalls.length === 0 ? (
           <div className="px-6 py-12 text-center">
-            <svg className="w-12 h-12 text-gray-300 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-12 h-12 text-gray-300 dark:text-gray-700 mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 5a2 2 0 012-2h3.28a1 1 0 01.948.684l1.498 4.493a1 1 0 01-.502 1.21l-2.257 1.13a11.042 11.042 0 005.516 5.516l1.13-2.257a1 1 0 011.21-.502l4.493 1.498a1 1 0 01.684.949V19a2 2 0 01-2 2h-1C9.716 21 3 14.284 3 6V5z" />
             </svg>
-            <p className="text-gray-500 font-medium">No calls yet</p>
-            <p className="text-sm text-gray-400 mt-1">
+            <p className="text-gray-500 dark:text-gray-400 font-medium">No calls yet</p>
+            <p className="text-sm text-gray-400 dark:text-gray-500 mt-1">
               Once Andy starts answering calls, they'll appear here.
             </p>
           </div>
         ) : (
-          <div className="divide-y divide-gray-100">
+          <div className="divide-y divide-gray-100 dark:divide-gray-800">
             {recentCalls.map((call) => (
               <Link
                 key={call.id}
                 to={`/app/calls/${call.id}`}
-                className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50 transition-colors"
+                className="flex items-center gap-4 px-6 py-4 hover:bg-gray-50 dark:hover:bg-gray-800/50 transition-colors"
               >
                 <div
                   className={`w-10 h-10 rounded-full flex items-center justify-center flex-shrink-0 ${
                     call.urgency === 'high'
-                      ? 'bg-red-100 text-red-600'
+                      ? 'bg-red-100 dark:bg-red-950/50 text-red-600 dark:text-red-400'
                       : 'bg-primary/10 text-primary'
                   }`}
                 >
@@ -255,18 +256,18 @@ export default function Dashboard() {
                   </svg>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-medium text-gray-900 truncate">
+                  <p className="font-medium text-gray-900 dark:text-white truncate">
                     {call.callerName || 'Unknown Caller'}
                   </p>
-                  <p className="text-sm text-gray-500 truncate">
+                  <p className="text-sm text-gray-500 dark:text-gray-400 truncate">
                     {call.summary || 'No summary'}
                   </p>
                 </div>
                 <div className="text-right flex-shrink-0">
-                  <p className="text-sm text-gray-500">
+                  <p className="text-sm text-gray-500 dark:text-gray-400">
                     {new Date(call.createdAt).toLocaleDateString()}
                   </p>
-                  <p className="text-xs text-gray-400">
+                  <p className="text-xs text-gray-400 dark:text-gray-500">
                     {call.duration ? `${Math.round(call.duration / 60)}m ${call.duration % 60}s` : '--'}
                   </p>
                 </div>
